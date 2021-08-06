@@ -1,0 +1,40 @@
+{
+  "name": "volgait-optimax",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production gulp build",
+    "dev": "cross-env NODE_ENV=development gulp dev",
+    "start": "cross-env NODE_ENV=development gulp start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danya0/volgait-optimax.git"
+  },
+  "author": "Danil <danya0> Samarkin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danya0/volgait-optimax/issues"
+  },
+  "homepage": "https://github.com/danya0/volgait-optimax#readme",
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
+    "@babel/preset-env": "^7.15.0",
+    "@babel/preset-typescript": "^7.15.0",
+    "babel-loader": "^8.2.2",
+    "browser-sync": "^2.27.5",
+    "cross-env": "^7.0.3",
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-if": "^3.0.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.0.0",
+    "sass": "^1.37.5",
+    "webpack-stream": "^6.1.2"
+  }
+}
