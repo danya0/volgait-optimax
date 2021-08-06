@@ -64,7 +64,7 @@ function js() {
           webpack({
             mode: isDev ? 'development' : 'production',
             output: {
-              filename: 'script.js',
+              filename: 'widget.js',
             },
             devtool: isProd ? false : 'source-map',
             module: {
