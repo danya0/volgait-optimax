@@ -6,12 +6,12 @@ const gulpIf = require('gulp-if')
 const webpack = require('webpack-stream')
 const autoprefixer = require("gulp-autoprefixer")
 const scss = require('gulp-sass')(require('sass'))
-const cleanCSS = require('gulp-clean-css');
+const cleanCSS = require('gulp-clean-css')
 
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = !isDev
 
-const projectFolder = 'dist';
+const projectFolder = 'dist'
 
 const path = {
   build: {
@@ -112,7 +112,7 @@ function watchFiles() {
 }
 
 const dev = gulp.series(clean, gulp.parallel(html, css, js))
-const start = gulp.series(dev, gulp.parallel(watchFiles, serve));
+const start = gulp.series(dev, gulp.parallel(watchFiles, serve))
 
 gulp.task('dev', dev)
 gulp.task('build', dev)
