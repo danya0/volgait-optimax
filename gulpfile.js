@@ -83,7 +83,7 @@ function js() {
               ]
             },
             resolve: {
-              extensions: [ '.ts', '.ts' ],
+              extensions: [ '.js', '.ts' ],
             },
           })
       )
