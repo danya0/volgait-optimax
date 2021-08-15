@@ -1,0 +1,54 @@
+.widget {
+  border: 1px solid gray;
+  display: grid;
+  grid-template: 413px 1fr / 444px 1fr;
+  grid-template-areas: "tryon info" "goods goods";
+
+  height: 611px;
+  width: 751px;
+  border-radius: 12px;
+  overflow: hidden;
+
+  &.menu-opened {
+    & .info, & .goods {
+      display: none;
+    }
+    & .menu, & .buttons {
+      display: flex;
+    }
+
+    grid-template-areas: "tryon cust" "buttons cust";
+  }
+
+  &.allow {
+    .tryon-first-block {
+      display: none;
+    }
+    .tryon-allow-block {
+      display: flex;
+    }
+  }
+}
+
+.tryon {
+  border-radius: 12px;
+  grid-area: tryon;
+}
+
+.info {
+  grid-area: info;
+}
+
+.menu {
+  display: none;
+  grid-area: cust;
+}
+
+.goods {
+  grid-area: goods;
+}
+
+.buttons {
+  display: none;
+  grid-area: buttons;
+}

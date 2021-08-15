@@ -6,12 +6,12 @@ const gulpIf = require('gulp-if')
 const webpack = require('webpack-stream')
 const autoprefixer = require("gulp-autoprefixer")
 const scss = require('gulp-sass')(require('sass'))
-const cleanCSS = require('gulp-clean-css');
+const cleanCSS = require('gulp-clean-css')
 
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = !isDev
 
-const projectFolder = 'dist';
+const projectFolder = 'dist'
 
 const path = {
   build: {
@@ -19,16 +19,19 @@ const path = {
     css: projectFolder + '/css/',
     js: projectFolder + '/js/',
     img: projectFolder + '/img/',
+    assets: projectFolder + '/assets/'
   },
   source: {
     html: '*.html',
     css: 'scss/**/*.scss',
     js: 'ts/script.ts',
+    assets: 'assets/**/*.*'
   },
   watch: {
     html: '*.html',
     css: 'scss/**/*.scss',
     js: 'ts/**/*.ts',
+    assets: 'assets/**/*.*'
   },
   clean: `./${projectFolder}/`,
 };
@@ -64,7 +67,7 @@ function js() {
           webpack({
             mode: isDev ? 'development' : 'production',
             output: {
-              filename: 'script.js',
+              filename: 'widget.js',
             },
             devtool: isProd ? false : 'source-map',
             module: {
@@ -95,6 +98,11 @@ function clean() {
   return del(path.clean)
 }
 
+function copyAssets() {
+  return gulp.src(path.source.assets)
+      .pipe(gulp.dest(path.build.assets))
+}
+
 function serve() {
   browserSync.init({
     server: {
@@ -109,10 +117,11 @@ function watchFiles() {
   gulp.watch([path.watch.html], html)
   gulp.watch([path.watch.css], css)
   gulp.watch([path.watch.js], js)
+  gulp.watch([path.watch.assets], copyAssets)
 }
 
-const dev = gulp.series(clean, gulp.parallel(html, css, js))
-const start = gulp.series(dev, gulp.parallel(watchFiles, serve));
+const dev = gulp.series(clean, gulp.parallel(html, css, js, copyAssets))
+const start = gulp.series(dev, gulp.parallel(watchFiles, serve))
 
 gulp.task('dev', dev)
 gulp.task('build', dev)

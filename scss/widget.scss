@@ -1,0 +1,54 @@
+@import 'fonts';
+@import 'variables';
+
+[data-virtual-mirror-widget] {
+  @import 'grid';
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  font-family: 'Open Sans', sans-serif;
+
+  .button {
+    cursor: pointer;
+    display: block;
+    background: #000;
+    color: #ffffff !important;
+    border: none;
+    outline: none;
+    border-radius: 50px;
+    padding: 8px 23px;
+
+    &.center {
+      margin: 0 auto;
+    }
+
+    &.white {
+      background: #ffffff;
+      color: #000000 !important;
+      border: 1px solid #E1E1E1;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.03);
+      font-family: Montserrat, sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 11px;
+      line-height: 14px;
+    }
+  }
+
+  .h {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    color: $titleColor;
+
+    &.white {
+      color: #ffffff;
+    }
+  }
+
+  @import 'blocks/info';
+  @import 'blocks/goods';
+  @import 'blocks/tryon';
+  @import 'blocks/buttons';
+  @import 'blocks/menu';
+}
