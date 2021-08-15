@@ -19,16 +19,19 @@ const path = {
     css: projectFolder + '/css/',
     js: projectFolder + '/js/',
     img: projectFolder + '/img/',
+    assets: projectFolder + '/assets/'
   },
   source: {
     html: '*.html',
     css: 'scss/**/*.scss',
     js: 'ts/script.ts',
+    assets: 'assets/**/*.*'
   },
   watch: {
     html: '*.html',
     css: 'scss/**/*.scss',
     js: 'ts/**/*.ts',
+    assets: 'assets/**/*.*'
   },
   clean: `./${projectFolder}/`,
 };
@@ -95,6 +98,11 @@ function clean() {
   return del(path.clean)
 }
 
+function copyAssets() {
+  return gulp.src(path.source.assets)
+      .pipe(gulp.dest(path.build.assets))
+}
+
 function serve() {
   browserSync.init({
     server: {
@@ -109,9 +117,10 @@ function watchFiles() {
   gulp.watch([path.watch.html], html)
   gulp.watch([path.watch.css], css)
   gulp.watch([path.watch.js], js)
+  gulp.watch([path.watch.assets], copyAssets)
 }
 
-const dev = gulp.series(clean, gulp.parallel(html, css, js))
+const dev = gulp.series(clean, gulp.parallel(html, css, js, copyAssets))
 const start = gulp.series(dev, gulp.parallel(watchFiles, serve))
 
 gulp.task('dev', dev)

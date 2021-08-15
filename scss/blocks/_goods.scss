@@ -1,0 +1,38 @@
+.goods {
+  padding-top: 25px;
+  padding-bottom: 35px;
+
+  &__title {
+    padding-left: 22px;
+    z-index: 2;
+  }
+
+  &-block {
+    z-index: 1;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 35px;
+    margin-top: -15px;
+  }
+
+  &__item {
+    max-width: 199px;
+  }
+
+  &__lens {
+    display: block;
+    width: 199px;
+    height: 99px;
+    background: darkolivegreen;
+  }
+
+  &__name {
+    text-align: center;
+    color: $namesColor;
+    font-family: Open Sans, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 24px;
+  }
+}
