@@ -1,10 +1,10 @@
-<div class="widget menu-opened"> <!-- menu-opened, allow -->
+<div class="widget"> <!-- menu-opened, allow -->
   <div class="tryon">
     <div class="tryon-first-block">
       <div class="tryon__profile" id="profile"></div>
       <div class="logo" id="logo"></div>
       <div class="tryon__lens" id="lens"></div>
-      <div class="tryon__button button white">
+      <div class="tryon__button button white" id="upload-btn">
         <svg style="margin-bottom: -2px" width="33" height="27" viewBox="0 0 33 27" fill="none"
              xmlns="http://www.w3.org/2000/svg">
           <g id="Camera">
@@ -41,8 +41,8 @@
 
   <div class="info">
     <div class="h title" data-title>Ray-Ban</div>
-    <div class="info__lens"></div>
-    <button class="button h info__button">Choose Lenses</button>
+    <div class="info__lens" id="info-lens"></div>
+    <button class="button h info__button" id="choose-btn">Choose Lenses</button>
     <div class="info__text">
       <div class="text__title h">Product Description</div>
       <div class="text__descr">The Ray-Ban 5228 is the slimmer take on the iconic wayframe. Crafted from premium
@@ -53,7 +53,7 @@
   </div>
   <!-- or -->
   <div class="menu">
-    <div class="menu-back">
+    <div class="menu-back" id="back-btn">
       <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M7.15381 1L0.999962 6L7.15381 11" stroke="black" stroke-width="1.4" stroke-linecap="round"
               stroke-linejoin="round"/>
@@ -121,7 +121,7 @@
   <div class="buttons">
     <div class="buttons-block">
       <button class="buttons__button button h">Try On Glasses</button>
-      <button class="buttons__reset">Reset Adjastments</button>
+      <button class="buttons__reset" id="reset">Reset Adjastments</button>
     </div>
   </div>
 </div>
