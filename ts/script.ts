@@ -1,4 +1,7 @@
-import {cssUrl} from "./utils";
+import '../scss/widget.scss'
+import {cssUrl} from "./utils"
+import Swiper from 'swiper/bundle';
+import 'swiper/swiper-bundle.css';
 
 enum States {
     AllowCamera = 'allow',
@@ -11,7 +14,6 @@ class VirtualMirrorWidget {
     readonly wOptions = {
         initId: 'virtual-mirror-widget',
         htmlFileLocation: this.cdnServer + 'widget.html',
-        cssFileLocation: this.cdnServer + 'css/widget.css',
         lensUrl: '',
         imagesLocation: {
             logo: this.cdnServer + this.assetsFolder + 'logo.png',
@@ -39,7 +41,7 @@ class VirtualMirrorWidget {
     }
 
     init(): void {
-        this.loadStyleFile()
+        // this.loadStyleFile()
 
         this.wContainer = document.querySelector(`#${this.wOptions.initId}`)
         this.wContainer.dataset.virtualMirrorWidget = '' // add the date attribute to add styles
@@ -56,6 +58,7 @@ class VirtualMirrorWidget {
                 this.loadImages()
                 this.rangeListener()
                 this.addListeners()
+                this.createSlider()
             })
             .catch((error) => {
                 this.wContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
@@ -63,17 +66,13 @@ class VirtualMirrorWidget {
             })
     }
 
-    loadStyleFile(): void {
-        const style = document.createElement('link')
-        style.rel = 'stylesheet'
-        style.type = 'text/css'
-        style.href = this.wOptions.cssFileLocation
-        document.head.appendChild(style)
-    }
-
     loadImages(): void {
         this.wContainer.querySelector(`#logo`).style.backgroundImage = cssUrl(this.wOptions.imagesLocation.logo)
         this.wContainer.querySelector(`#profile`).style.backgroundImage = cssUrl(this.wOptions.imagesLocation.profile)
+    }
+
+    createSlider(): void {
+        new Swiper('.goods-block', {})
     }
 
     rangeListener(reset?: boolean): void {
