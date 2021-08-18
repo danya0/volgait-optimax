@@ -41,8 +41,6 @@ class VirtualMirrorWidget {
     }
 
     init(): void {
-        // this.loadStyleFile()
-
         this.wContainer = document.querySelector(`#${this.wOptions.initId}`)
         this.wContainer.dataset.virtualMirrorWidget = '' // add the date attribute to add styles
         this.wContainer.textContent = 'Wait a second, the widget is loading...'
@@ -56,9 +54,9 @@ class VirtualMirrorWidget {
                 this.wEl = this.wContainer.childNodes[0]
 
                 this.loadImages()
+                this.createSlider()
                 this.rangeListener()
                 this.addListeners()
-                this.createSlider()
             })
             .catch((error) => {
                 this.wContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
@@ -72,7 +70,13 @@ class VirtualMirrorWidget {
     }
 
     createSlider(): void {
-        new Swiper('.goods-block', {})
+        new Swiper('.goods-block', {
+            slidesPerView: 3,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        })
     }
 
     rangeListener(reset?: boolean): void {

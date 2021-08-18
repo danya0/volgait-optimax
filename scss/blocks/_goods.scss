@@ -8,14 +8,16 @@
   }
 
   &-block {
+    position: relative;
     z-index: 1;
     display: flex;
     justify-content: space-around;
-    padding: 0 35px;
+    padding: 0 47px;
     margin-top: -15px;
   }
 
   &__item {
+    cursor: pointer;
     max-width: 199px;
   }
 
