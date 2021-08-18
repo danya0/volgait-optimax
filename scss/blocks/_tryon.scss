@@ -64,12 +64,27 @@
     border-radius: 10px;
   }
 
+  &-lens-wrap {
+    position: absolute;
+    z-index: 1;
+    left: 125px;
+    top: 130px;
+    width: 200px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(plum, .5);
+  }
+
   &__lens {
     position: absolute;
-    left: 148px;
-    top: 165px;
-    width: 157px;
+    width: 200px;
+    left: 126px;
+    top: 167px;
     height: 55px;
-    background: rgba(plum, .4);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
   }
 }

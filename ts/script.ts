@@ -22,17 +22,20 @@ class VirtualMirrorWidget {
     }
 
     controls = {
+        title: 'title',
+        description: 'description',
+        infoLens: 'info-lens',
         choose: 'choose-btn',
         back: 'back-btn',
         upload: 'upload-btn',
         lens: 'lens',
-        infoLens: 'info-lens',
         pd: 'pd',
         size: 'size',
         rotate: 'rotate',
         reset: 'reset'
     }
-
+    lens = []
+    activeLens = 0
     wContainer = null
     wEl = null
 
@@ -53,8 +56,9 @@ class VirtualMirrorWidget {
                 this.wContainer.innerHTML = html
                 this.wEl = this.wContainer.childNodes[0]
 
+                this.findControls()
                 this.loadImages()
-                this.createSlider()
+                this.loadLens()
                 this.rangeListener()
                 this.addListeners()
             })
@@ -69,6 +73,12 @@ class VirtualMirrorWidget {
         this.wContainer.querySelector(`#profile`).style.backgroundImage = cssUrl(this.wOptions.imagesLocation.profile)
     }
 
+    findControls(): void {
+        Object.keys(this.controls).map(key => {
+            this.controls[key] = this.wContainer.querySelector(`#${this.controls[key]}`)
+        })
+    }
+
     createSlider(): void {
         new Swiper('.goods-block', {
             slidesPerView: 3,
@@ -76,6 +86,58 @@ class VirtualMirrorWidget {
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
             },
+        })
+    }
+
+    loadLens(): void {
+        const wrap = document.querySelector('.goods-block .swiper-wrapper')
+        fetch('https://optimaxdev.github.io/volga-it/response.json')
+            .then(res => res.json())
+            .then(data => {
+                const lensTemplate = (name: string, image: string, id: number) => (`
+                    <div class="swiper-slide">
+                      <div class="goods__item" data-lens-id="${id}">
+                        <img src="${image}" alt="lens" class="goods__lens"/>
+                        <div class="goods__name">${name}</div>
+                      </div>
+                    </div>
+                `)
+                const lens = []
+
+                console.log(data.items)
+
+                data.items.map((l, i) => lens.push(lensTemplate(l.name, l.image, i)))
+                wrap.innerHTML = lens.join('')
+                this.lens = data.items
+                this.changeLensInfo(data.items[this.activeLens])
+
+                this.createSlider()
+                this.clickLens(wrap)
+            })
+            .catch(e => {
+                console.log(e.message)
+                wrap.textContent = 'Something went wrong while loading data'
+            })
+    }
+
+    changeLensInfo(lensItem): void {
+        const {name, description, image, mirror_frame: mirrorFrame, width: frameWidth} = lensItem
+
+        this.controls.title.textContent = name
+        this.controls.description.textContent = description
+        this.controls.infoLens.style.backgroundImage = cssUrl(image)
+        this.controls.lens.style.backgroundImage = cssUrl(mirrorFrame)
+    }
+
+    clickLens(wrap): void {
+        wrap.addEventListener('click', e => {
+            const target = e.target.parentElement
+            const lensId = target.dataset.lensId
+
+            if (target.classList.contains('goods__item')) {
+                this.activeLens = lensId
+                this.changeLensInfo(this.lens[lensId])
+            }
         })
     }
 
@@ -133,9 +195,7 @@ class VirtualMirrorWidget {
         }
 
         Object.keys(this.controls).map(key => {
-            const selector = this.wContainer.querySelector(`#${this.controls[key]}`)
-            this.controls[key] = selector
-            selector.addEventListener('click', buttonsEvents[key])
+            this.controls[key].addEventListener('click', buttonsEvents[key])
         })
     }
 }
