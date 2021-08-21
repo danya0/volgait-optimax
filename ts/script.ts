@@ -1,69 +1,204 @@
-import {cssUrl} from "./utils";
+import '../scss/widget.scss'
+import {$cssUrl} from "./utils"
+import Swiper from 'swiper/bundle';
+import 'swiper/swiper-bundle.css';
+
+enum States {
+    AllowCamera = 'allow',
+    Menu = 'menu-opened'
+}
 
 class VirtualMirrorWidget {
-    readonly cdnServer = '/' // В дальнейшем вы можете изменить путь к cmd серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
+    readonly cdnServer = '/' // В дальнейшем вы можете изменить путь к c серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
     readonly assetsFolder = 'assets/'
-    readonly widgetSettings = {
+    readonly wOptions = {
         initId: 'virtual-mirror-widget',
         htmlFileLocation: this.cdnServer + 'widget.html',
-        cssFileLocation: this.cdnServer + 'css/widget.css',
+        lensUrl: '',
         imagesLocation: {
             logo: this.cdnServer + this.assetsFolder + 'logo.png',
             profile: this.cdnServer + this.assetsFolder + 'woman.png'
         }
     }
 
-    widgetContainer = null
+    controls = {
+        title: 'title',
+        description: 'description',
+        infoLens: 'info-lens',
+        choose: 'choose-btn',
+        back: 'back-btn',
+        upload: 'upload-btn',
+        lens: 'lens',
+        pd: 'pd',
+        size: 'size',
+        rotate: 'rotate',
+        reset: 'reset'
+    }
+    lens = []
+    activeLens = 0
+    wContainer = null
+    wEl = null
 
     constructor() {
         this.init()
     }
 
     init(): void {
-        this.loadStyleFile()
+        this.wContainer = document.querySelector(`#${this.wOptions.initId}`)
+        this.wContainer.dataset.virtualMirrorWidget = '' // add the date attribute to add styles
+        this.wContainer.textContent = 'Wait a second, the widget is loading...'
 
-        this.widgetContainer = document.querySelector(`#${this.widgetSettings.initId}`)
-        this.widgetContainer.dataset.virtualMirrorWidget = '' // add the date attribute to add styles
-        this.widgetContainer.textContent = 'Wait a second, the widget is loading...'
-
-        fetch(this.widgetSettings.htmlFileLocation)
+        fetch(this.wOptions.htmlFileLocation)
             .then((response) => response.ok
                 ? response.text()
                 : 'An error occurred while loading the widget. For more information, see the developer console.')
             .then((html) => {
-                this.widgetContainer.innerHTML = html
+                this.wContainer.innerHTML = html
+                this.wEl = this.wContainer.childNodes[0]
 
+                this.findControls()
                 this.loadImages()
+                this.loadLens()
                 this.rangeListener()
+                this.addListeners()
             })
             .catch((error) => {
-                this.widgetContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
+                this.wContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
                 console.warn(error)
             })
     }
 
-    loadStyleFile() {
-        const style = document.createElement('link')
-        style.rel = 'stylesheet'
-        style.type = 'text/css'
-        style.href = this.widgetSettings.cssFileLocation
-        document.head.appendChild(style)
+    loadImages(): void {
+        this.wContainer.querySelector(`#logo`).style.backgroundImage = $cssUrl(this.wOptions.imagesLocation.logo)
+        this.wContainer.querySelector(`#profile`).style.backgroundImage = $cssUrl(this.wOptions.imagesLocation.profile)
     }
 
-    loadImages() {
-        this.widgetContainer.querySelector(`#logo`).style.backgroundImage = cssUrl(this.widgetSettings.imagesLocation.logo)
-        this.widgetContainer.querySelector(`#profile`).style.backgroundImage = cssUrl(this.widgetSettings.imagesLocation.profile)
+    findControls(): void {
+        Object.keys(this.controls).map(key => {
+            this.controls[key] = this.wContainer.querySelector(`#${this.controls[key]}`)
+        })
     }
 
-    rangeListener() {
-        const range = this.widgetContainer.querySelectorAll('input[type="range"]')
-        const progress = this.widgetContainer.querySelectorAll('input[type="range"] + .progress')
-        range.forEach((item, idx) => {
-            item.addEventListener('input',e => {
+    createSlider(): void {
+        new Swiper('.goods-block', {
+            slidesPerView: 3,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        })
+    }
+
+    loadLens(): void {
+        const wrap = document.querySelector('.goods-block .swiper-wrapper')
+        fetch('https://optimaxdev.github.io/volga-it/response.json')
+            .then(res => res.json())
+            .then(data => {
+                const lensTemplate = (name: string, image: string, id: number) => (`
+                    <div class="swiper-slide">
+                      <div class="goods__item" data-lens-id="${id}">
+                        <img src="${image}" alt="lens" class="goods__lens"/>
+                        <div class="goods__name">${name}</div>
+                      </div>
+                    </div>
+                `)
+                const lens = []
+
+                console.log(data.items)
+
+                data.items.map((l, i) => lens.push(lensTemplate(l.name, l.image, i)))
+                wrap.innerHTML = lens.join('')
+                this.lens = data.items
+                this.changeLensInfo(data.items[this.activeLens])
+
+                this.createSlider()
+                this.clickLens(wrap)
+            })
+            .catch(e => {
+                console.log(e.message)
+                wrap.textContent = 'Something went wrong while loading data'
+            })
+    }
+
+    changeLensInfo(lensItem): void {
+        const {name, description, image, mirror_frame: mirrorFrame, width: frameWidth} = lensItem
+        const pd = this.controls.pd.value
+        const $frameScaleRatio = (frameWidth / 200) / (pd / 100) // Не до конца понял формулу скейла. Скорее всего необходимы правки в данном месте. Чем отличается pd от $distanceBetweenPupilMarks$ - вообще загадка.
+        this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
+
+        this.controls.title.textContent = name
+        this.controls.description.textContent = description
+        this.controls.infoLens.style.backgroundImage = $cssUrl(image)
+        this.controls.lens.style.backgroundImage = $cssUrl(mirrorFrame)
+    }
+
+    clickLens(wrap): void {
+        wrap.addEventListener('click', e => {
+            const target = e.target.parentElement
+            const lensId = target.dataset.lensId
+
+            if (target.classList.contains('goods__item')) {
+                this.activeLens = lensId
+                this.changeLensInfo(this.lens[lensId])
+            }
+        })
+    }
+
+    rangeListener(reset?: boolean): void {
+        const ranges = this.wContainer.querySelectorAll('input[type="range"]')
+        const progress = this.wContainer.querySelectorAll('input[type="range"] + .progress')
+
+        if (reset) {
+            progress.forEach(item => item.style.width = 0)
+            ranges.forEach(r => r.value = 0)
+            return
+        }
+
+        ranges.forEach((item, idx) => {
+            item.addEventListener('input', e => {
                 const {min, max, value: val} = e.target
                 let f = (val - min) * 100 / (max - min)
                 progress[idx].style.width = f < 10 ? f + 3 + '%' : f + '%' // + 3 - so that the border radius is not visible
             })
+        })
+    }
+
+    setStateWidget(className: States, remove?: boolean): void {
+        if (remove) {
+            this.wEl.classList.remove(<string>className)
+        } else {
+            this.wEl.classList.add(<string>className)
+        }
+    }
+
+    addListeners(): void {
+        const buttonsEvents = {
+            choose: () => {
+                this.setStateWidget(States.Menu)
+            },
+            back: () => {
+                this.setStateWidget(States.Menu, true)
+            },
+            upload: () => {
+                this.setStateWidget(States.AllowCamera)
+            },
+            pd: () => {
+
+            },
+            size: () => {
+
+            },
+            rotate: () => {
+
+            },
+            reset: () => {
+                this.rangeListener(true)
+                // this.controls.pd.value = 64
+            }
+        }
+
+        Object.keys(this.controls).map(key => {
+            this.controls[key].addEventListener('click', buttonsEvents[key])
         })
     }
 }
