@@ -1,1 +1,1 @@
-export const cssUrl = (url: string) => `url(${url})`
+export const $cssUrl = (url: string) => `url(${url})`

@@ -1,5 +1,5 @@
 import '../scss/widget.scss'
-import {cssUrl} from "./utils"
+import {$cssUrl} from "./utils"
 import Swiper from 'swiper/bundle';
 import 'swiper/swiper-bundle.css';
 
@@ -9,7 +9,7 @@ enum States {
 }
 
 class VirtualMirrorWidget {
-    readonly cdnServer = '/' // В дальнейшем вы можете изменить путь к cmd серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
+    readonly cdnServer = '/' // В дальнейшем вы можете изменить путь к c серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
     readonly assetsFolder = 'assets/'
     readonly wOptions = {
         initId: 'virtual-mirror-widget',
@@ -69,8 +69,8 @@ class VirtualMirrorWidget {
     }
 
     loadImages(): void {
-        this.wContainer.querySelector(`#logo`).style.backgroundImage = cssUrl(this.wOptions.imagesLocation.logo)
-        this.wContainer.querySelector(`#profile`).style.backgroundImage = cssUrl(this.wOptions.imagesLocation.profile)
+        this.wContainer.querySelector(`#logo`).style.backgroundImage = $cssUrl(this.wOptions.imagesLocation.logo)
+        this.wContainer.querySelector(`#profile`).style.backgroundImage = $cssUrl(this.wOptions.imagesLocation.profile)
     }
 
     findControls(): void {
@@ -122,11 +122,14 @@ class VirtualMirrorWidget {
 
     changeLensInfo(lensItem): void {
         const {name, description, image, mirror_frame: mirrorFrame, width: frameWidth} = lensItem
+        const pd = this.controls.pd.value
+        const $frameScaleRatio = (frameWidth / 200) / (pd / 100) // Не до конца понял формулу скейла. Скорее всего необходимы правки в данном месте. Чем отличается pd от $distanceBetweenPupilMarks$ - вообще загадка.
+        this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
 
         this.controls.title.textContent = name
         this.controls.description.textContent = description
-        this.controls.infoLens.style.backgroundImage = cssUrl(image)
-        this.controls.lens.style.backgroundImage = cssUrl(mirrorFrame)
+        this.controls.infoLens.style.backgroundImage = $cssUrl(image)
+        this.controls.lens.style.backgroundImage = $cssUrl(mirrorFrame)
     }
 
     clickLens(wrap): void {
