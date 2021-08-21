@@ -64,19 +64,6 @@
     border-radius: 10px;
   }
 
-  &-lens-wrap {
-    position: absolute;
-    z-index: 1;
-    left: 125px;
-    top: 130px;
-    width: 200px;
-    height: 120px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(plum, .5);
-  }
-
   &__lens {
     position: absolute;
     width: 200px;
