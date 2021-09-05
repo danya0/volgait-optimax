@@ -21,11 +21,20 @@
   }
 
   &.allow {
-    .tryon-first-block {
-      display: none;
-    }
     .tryon-allow-block {
-      display: flex;
+      visibility: visible;
+    }
+  }
+
+  &.camera {
+    .tryon-camera {
+      visibility: visible;
+    }
+  }
+
+  &.loader {
+    .tryon-loader {
+      visibility: visible;
     }
   }
 }

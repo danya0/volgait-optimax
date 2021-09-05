@@ -5,7 +5,15 @@ import 'swiper/swiper-bundle.css';
 
 enum States {
     AllowCamera = 'allow',
-    Menu = 'menu-opened'
+    Menu = 'menu-opened',
+    Camera = 'camera',
+    Loader = 'loader'
+}
+
+enum TryonButtonState {
+    Upload = 'Upload',
+    Snap = 'Snapshot',
+    Retake = 'Retake'
 }
 
 class VirtualMirrorWidget {
@@ -27,7 +35,8 @@ class VirtualMirrorWidget {
         infoLens: 'info-lens',
         choose: 'choose-btn',
         back: 'back-btn',
-        upload: 'upload-btn',
+        tryonBtn: 'tryon-btn',
+        tryonBtnText: 'tryon-btn span',
         lens: 'lens',
         pd: 'pd',
         size: 'size',
@@ -38,6 +47,16 @@ class VirtualMirrorWidget {
     activeLens = 0
     wContainer = null
     wEl = null
+    tryonButtonState = TryonButtonState.Upload
+    videoSettings = {
+        width: 320,
+        height: 0,
+        streaming: false,
+        canvas: null,
+        video: null,
+        stream: null,
+        allow: false
+    }
 
     constructor() {
         this.init()
@@ -171,6 +190,46 @@ class VirtualMirrorWidget {
         }
     }
 
+    loadVideo(): void {
+        this.videoSettings.allow ? this.setStateWidget(States.Loader) : this.setStateWidget(States.AllowCamera) // add allow class
+
+        if (!this.videoSettings.allow) {
+            this.videoSettings.video = this.wContainer.querySelector('#video')
+            this.videoSettings.canvas = this.wContainer.querySelector('#canvas')
+        }
+
+        this.videoSettings.canvas.style.zIndex = ''
+
+        navigator.mediaDevices.getUserMedia({video: true})
+            .then(stream => {
+                this.videoSettings.stream = stream
+                this.videoSettings.allow ? this.setStateWidget(States.Loader, true) : this.setStateWidget(States.AllowCamera, true) // remove loader or allow class when stream is ready
+                this.videoSettings.allow = true
+                this.setStateWidget(States.Camera)
+                this.videoSettings.video.srcObject = stream
+                this.videoSettings.video.play()
+                this.controls.tryonBtnText.textContent = this.tryonButtonState = TryonButtonState.Snap
+            })
+            .catch(err => {
+                console.log("An error occurred: " + err)
+            });
+
+        this.videoSettings.video.addEventListener('canplay', () => {
+            if (!this.videoSettings.streaming) {
+                this.videoSettings.height = this.videoSettings.video.videoHeight / (this.videoSettings.video.videoWidth / this.videoSettings.width)
+                if (isNaN(this.videoSettings.height)) {
+                    this.videoSettings.height = this.videoSettings.width / (4 / 3)
+                }
+
+                this.videoSettings.video.setAttribute('width', this.videoSettings.width.toString())
+                this.videoSettings.video.setAttribute('height', this.videoSettings.height.toString())
+                this.videoSettings.canvas.setAttribute('width', this.videoSettings.width.toString())
+                this.videoSettings.canvas.setAttribute('height', this.videoSettings.height.toString())
+                this.videoSettings.streaming = true;
+            }
+        }, false);
+    }
+
     addListeners(): void {
         const buttonsEvents = {
             choose: () => {
@@ -179,8 +238,26 @@ class VirtualMirrorWidget {
             back: () => {
                 this.setStateWidget(States.Menu, true)
             },
-            upload: () => {
-                this.setStateWidget(States.AllowCamera)
+            tryonBtn: () => {
+                if (this.tryonButtonState === TryonButtonState.Upload || this.tryonButtonState === TryonButtonState.Retake) {
+                    this.loadVideo()
+                } else if (this.tryonButtonState === TryonButtonState.Snap) {
+                    this.setStateWidget(States.Menu)
+                    this.videoSettings.canvas.style.zIndex = 2
+                    this.controls.lens.style.zIndex = 4
+                    const context = this.videoSettings.canvas.getContext('2d')
+                    this.controls.tryonBtnText.textContent = this.tryonButtonState = TryonButtonState.Retake
+                    if (this.videoSettings.width && this.videoSettings.height) {
+                        console.log('image')
+                        this.videoSettings.canvas.width = this.videoSettings.width
+                        this.videoSettings.canvas.height = this.videoSettings.height
+                        context.drawImage(this.videoSettings.video, 0, 0, this.videoSettings.width, this.videoSettings.height)
+
+                        this.videoSettings.stream.getTracks().forEach(track => {
+                            track.stop();
+                        });
+                    }
+                }
             },
             pd: () => {
 

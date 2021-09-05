@@ -1,41 +1,55 @@
-<div class="widget"> <!-- menu-opened, allow -->
+<div class="widget"> <!-- menu-opened, allow, camera -->
   <div class="tryon">
     <div class="tryon-first-block">
       <div class="tryon__profile" id="profile"></div>
       <div class="logo" id="logo"></div>
-        <div class="tryon__lens" id="lens"></div>
-      <div class="tryon__button button white" id="upload-btn">
-        <svg style="margin-bottom: -2px" width="33" height="27" viewBox="0 0 33 27" fill="none"
-             xmlns="http://www.w3.org/2000/svg">
-          <g id="Camera">
-            <g id="Color">
-              <path id="Stroke 3" fill-rule="evenodd" clip-rule="evenodd"
-                    d="M17.6789 3.39178L19.2846 3.39178C22.54 3.39178 23.9974 4.92457 23.9974 7.93563L23.9974 18.0561C23.9974 19.4553 22.8195 20.6 21.3798 20.6L5.7128 20.6C2.80497 20.6 1 18.8255 1 16.0561L1 7.93563C1 4.93429 2.64449 3.39178 5.7128 3.39178L7.35601 3.39178L9.83814 0.853027L15.0732 0.853027L17.6789 3.39178Z"
-                    fill="black" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <path id="Stroke 1"
-                    d="M15.7 11.5C15.7 13.2676 14.2664 14.7 12.5 14.7C10.7322 14.7 9.3 13.2678 9.3 11.5C9.3 9.73223 10.7322 8.3 12.5 8.3C14.2664 8.3 15.7 9.73244 15.7 11.5Z"
-                    stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
-            </g>
-            <g id="Group 3">
-              <circle id="Oval" cx="24.565" cy="17.765" r="5.265" fill="white" stroke="white" stroke-width="6"/>
-              <circle id="Oval_2" cx="24.565" cy="17.765" r="5.265" fill="white" stroke="black" stroke-width="1.5"/>
-              <g id="plus">
-                <path id="Line" d="M26.428 17.684H22.54" stroke="black" stroke-width="1.62" stroke-linecap="round"
-                      stroke-linejoin="round"/>
-                <path id="Line_2" d="M24.484 19.628V15.74" stroke="black" stroke-width="1.62" stroke-linecap="round"
-                      stroke-linejoin="round"/>
-              </g>
-            </g>
-          </g>
-        </svg>
-        <span>Upload</span>
+      <div class="tryon__lens" id="lens"></div>
+
+      <!-- camera items -->
+      <div class="tryon-camera">
+        <video class="tryon-camera__video" id="video">Video stream not available.</video>
+        <canvas class="tryon-camera__picture" id="canvas"></canvas>
       </div>
+
     </div>
     <div class="tryon-allow-block">
       <div class="tryon-allow-block-wrap">
         <div class="tryon__allow-title">Allow camera access</div>
         <div class="tryon__allow-subtitle">We ask you to enable camera access so you can start trying on glasses.</div>
       </div>
+    </div>
+<!--    <div class="tryon-camera">-->
+<!--      -->
+<!--&lt;!&ndash;      <img class="tryon-camera__picture" id="photo" alt="The screen capture will appear in this box.">&ndash;&gt;-->
+<!--    </div>-->
+    <div class="tryon-loader">
+      <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="tryon__button button white" id="tryon-btn">
+      <svg style="margin-bottom: -2px" width="33" height="27" viewBox="0 0 33 27" fill="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <g id="Camera">
+          <g id="Color">
+            <path id="Stroke 3" fill-rule="evenodd" clip-rule="evenodd"
+                  d="M17.6789 3.39178L19.2846 3.39178C22.54 3.39178 23.9974 4.92457 23.9974 7.93563L23.9974 18.0561C23.9974 19.4553 22.8195 20.6 21.3798 20.6L5.7128 20.6C2.80497 20.6 1 18.8255 1 16.0561L1 7.93563C1 4.93429 2.64449 3.39178 5.7128 3.39178L7.35601 3.39178L9.83814 0.853027L15.0732 0.853027L17.6789 3.39178Z"
+                  fill="black" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="Stroke 1"
+                  d="M15.7 11.5C15.7 13.2676 14.2664 14.7 12.5 14.7C10.7322 14.7 9.3 13.2678 9.3 11.5C9.3 9.73223 10.7322 8.3 12.5 8.3C14.2664 8.3 15.7 9.73244 15.7 11.5Z"
+                  stroke="white" stroke-width="1.6" stroke-linejoin="round"/>
+          </g>
+          <g id="Group 3">
+            <circle id="Oval" cx="24.565" cy="17.765" r="5.265" fill="white" stroke="white" stroke-width="6"/>
+            <circle id="Oval_2" cx="24.565" cy="17.765" r="5.265" fill="white" stroke="black" stroke-width="1.5"/>
+            <g id="plus">
+              <path id="Line" d="M26.428 17.684H22.54" stroke="black" stroke-width="1.62" stroke-linecap="round"
+                    stroke-linejoin="round"/>
+              <path id="Line_2" d="M24.484 19.628V15.74" stroke="black" stroke-width="1.62" stroke-linecap="round"
+                    stroke-linejoin="round"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+      <span>Upload</span>
     </div>
   </div>
 
@@ -45,7 +59,8 @@
     <button class="button h info__button" id="choose-btn">Choose Lenses</button>
     <div class="info__text">
       <div class="text__title h">Product Description</div>
-      <div class="text__descr" id="description">The Ray-Ban 5228 is the slimmer take on the iconic wayframe. Crafted from premium
+      <div class="text__descr" id="description">The Ray-Ban 5228 is the slimmer take on the iconic wayframe. Crafted
+        from premium
         acetate, its sleek arms, silver accents and rich hue continues to leave a mark now just as it did in the early
         1950’s.
       </div>
@@ -115,4 +130,5 @@
       <button class="buttons__reset" id="reset">Reset Adjastments</button>
     </div>
   </div>
+
 </div>
