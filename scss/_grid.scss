@@ -17,6 +17,13 @@
       display: flex;
     }
 
+    .tryon__lens {
+      background: none !important;
+      .cross {
+        display: flex;
+      }
+    }
+
     grid-template-areas: "tryon cust" "buttons cust";
   }
 
