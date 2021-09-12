@@ -57,10 +57,7 @@ class VirtualMirrorWidget {
         stream: null,
         allow: false
     }
-    lensDefaultPosition = {
-        top: 167,
-        left: 160
-    }
+    lensDefaultValues: {[key: string]: number} = {}
 
     constructor() {
         this.init()
@@ -84,6 +81,7 @@ class VirtualMirrorWidget {
                 this.loadLens()
                 this.rangeListener()
                 this.addListeners()
+                this.findLensDefaultValues()
             })
             .catch((error) => {
                 this.wContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
@@ -144,8 +142,14 @@ class VirtualMirrorWidget {
     changeLensInfo(lensItem): void {
         const {name, description, image, mirror_frame: mirrorFrame, width: frameWidth} = lensItem
         const pd = this.controls.pd.value
-        const $frameScaleRatio = (frameWidth / 200) / (pd / 100) // Не до конца понял формулу скейла. Скорее всего необходимы правки в данном месте. Чем отличается pd от $distanceBetweenPupilMarks$ - вообще загадка.
-        this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
+        const $frameScaleRatio = (frameWidth / 200) / (pd / 100)
+        // Не до конца понял формулу скейла. Поэтому не стал применять её, т.к возникают баги в размерах
+        // this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
+        this.controls.lens.style.transform = `scale(${1.1})`
+
+        // console.log('scale formula: ', `(frameWidth(${frameWidth}) / 200) / (pd(${pd}) / 100)`)
+        // console.log(`${frameWidth / 200} / ${pd / 100}`)
+        // console.log($frameScaleRatio)
 
         this.controls.title.textContent = name
         this.controls.description.textContent = description
@@ -232,6 +236,23 @@ class VirtualMirrorWidget {
         }, false);
     }
 
+    findLensDefaultValues(): void {
+        const style = window.getComputedStyle(this.controls.lens)
+        const obj = {
+            width: style.width,
+            top: style.top,
+            left: style.left
+        }
+        Object.keys(obj).forEach(key => {
+            this.lensDefaultValues[key] = +obj[key].split('px')[0]
+        })
+    }
+
+    setLensInDefaultPositions(): void {
+        this.controls.lens.style.left = this.lensDefaultValues.left + 'px'
+        this.controls.lens.style.top = this.lensDefaultValues.top + 'px'
+    }
+
     addListeners(): void {
         // Объект котороый хранит внутри себя тип и само действие для элементов объекта controls
         const controlsEvents = {
@@ -243,6 +264,7 @@ class VirtualMirrorWidget {
                 },
                 back: () => {
                     this.setStateWidget(States.Menu, true)
+                    this.changeLensInfo(this.lens[this.activeLens])
                 },
                 tryonBtn: () => {
                     if (this.tryonButtonState === TryonButtonState.Upload || this.tryonButtonState === TryonButtonState.Retake) {
@@ -267,9 +289,6 @@ class VirtualMirrorWidget {
                         }
                     }
                 },
-                pd: () => {
-
-                },
                 size: () => {
 
                 },
@@ -278,7 +297,7 @@ class VirtualMirrorWidget {
                 },
                 reset: () => {
                     this.rangeListener(true)
-                    // this.controls.pd.value = 64
+                    this.controls.pd.value = 62
                 }
             },
             mousedown: {
@@ -315,11 +334,10 @@ class VirtualMirrorWidget {
 
                         const totalLeft = leftV + movementX
                         const totalTop = topV + movementY
-
                         if (totalLeft < 0
                             || totalTop < 0
                             || totalTop > bottomEdge
-                            || totalLeft > rightEdge
+                            || totalLeft > rightEdge && movementX > 0 // Проверяю movementX в случае если рядом с карем был увеличен pd и объект с крестом ушел за край видимости
                         ) {
                             mouseUp()
                             return
@@ -333,7 +351,15 @@ class VirtualMirrorWidget {
                 }
             },
             input: {
-
+                pd: e => {
+                    if (e.target.value < 50) {
+                        e.target.value = 50
+                    } else if (e.target.value > 150) {
+                        e.target.value = 150
+                    }
+                    const value = e.target.value - 62
+                    this.controls.lens.style.width = this.lensDefaultValues.width + value + 'px'
+                },
             }
         }
 
@@ -343,11 +369,6 @@ class VirtualMirrorWidget {
                 this.controls[key].addEventListener(action, controlsEvents[action][key])
             })
         })
-    }
-
-    setLensInDefaultPositions(): void {
-        this.controls.lens.style.left = this.lensDefaultPosition.left + 'px'
-        this.controls.lens.style.top = this.lensDefaultPosition.top + 'px'
     }
 }
 
