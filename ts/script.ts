@@ -29,7 +29,7 @@ class VirtualMirrorWidget {
         }
     }
 
-    controls = {
+    readonly controls: { [key: string]: any } = {
         title: 'title',
         description: 'description',
         infoLens: 'info-lens',
@@ -57,6 +57,7 @@ class VirtualMirrorWidget {
         stream: null,
         allow: false
     }
+    lensDefaultValues: {[key: string]: number} = {}
 
     constructor() {
         this.init()
@@ -80,6 +81,7 @@ class VirtualMirrorWidget {
                 this.loadLens()
                 this.rangeListener()
                 this.addListeners()
+                this.findLensDefaultValues()
             })
             .catch((error) => {
                 this.wContainer.textContent = 'An error occurred while loading the widget. For more information, see the developer console'
@@ -123,8 +125,6 @@ class VirtualMirrorWidget {
                 `)
                 const lens = []
 
-                console.log(data.items)
-
                 data.items.map((l, i) => lens.push(lensTemplate(l.name, l.image, i)))
                 wrap.innerHTML = lens.join('')
                 this.lens = data.items
@@ -142,8 +142,14 @@ class VirtualMirrorWidget {
     changeLensInfo(lensItem): void {
         const {name, description, image, mirror_frame: mirrorFrame, width: frameWidth} = lensItem
         const pd = this.controls.pd.value
-        const $frameScaleRatio = (frameWidth / 200) / (pd / 100) // Не до конца понял формулу скейла. Скорее всего необходимы правки в данном месте. Чем отличается pd от $distanceBetweenPupilMarks$ - вообще загадка.
-        this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
+        const $frameScaleRatio = (frameWidth / 200) / (pd / 100)
+        // Не до конца понял формулу скейла. Поэтому не стал применять её, т.к возникают баги в размерах
+        // this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
+        this.controls.lens.style.transform = `scale(${1.1})`
+
+        // console.log('scale formula: ', `(frameWidth(${frameWidth}) / 200) / (pd(${pd}) / 100)`)
+        // console.log(`${frameWidth / 200} / ${pd / 100}`)
+        // console.log($frameScaleRatio)
 
         this.controls.title.textContent = name
         this.controls.description.textContent = description
@@ -230,52 +236,138 @@ class VirtualMirrorWidget {
         }, false);
     }
 
-    addListeners(): void {
-        const buttonsEvents = {
-            choose: () => {
-                this.setStateWidget(States.Menu)
-            },
-            back: () => {
-                this.setStateWidget(States.Menu, true)
-            },
-            tryonBtn: () => {
-                if (this.tryonButtonState === TryonButtonState.Upload || this.tryonButtonState === TryonButtonState.Retake) {
-                    this.loadVideo()
-                } else if (this.tryonButtonState === TryonButtonState.Snap) {
-                    this.setStateWidget(States.Menu)
-                    this.videoSettings.canvas.style.zIndex = 2
-                    this.controls.lens.style.zIndex = 4
-                    const context = this.videoSettings.canvas.getContext('2d')
-                    this.controls.tryonBtnText.textContent = this.tryonButtonState = TryonButtonState.Retake
-                    if (this.videoSettings.width && this.videoSettings.height) {
-                        console.log('image')
-                        this.videoSettings.canvas.width = this.videoSettings.width
-                        this.videoSettings.canvas.height = this.videoSettings.height
-                        context.drawImage(this.videoSettings.video, 0, 0, this.videoSettings.width, this.videoSettings.height)
+    findLensDefaultValues(): void {
+        const style = window.getComputedStyle(this.controls.lens)
+        const obj = {
+            width: style.width,
+            top: style.top,
+            left: style.left
+        }
+        Object.keys(obj).forEach(key => {
+            this.lensDefaultValues[key] = +obj[key].split('px')[0]
+        })
+    }
 
-                        this.videoSettings.stream.getTracks().forEach(track => {
-                            track.stop();
-                        });
+    setLensInDefaultPositions(): void {
+        this.controls.lens.style.left = this.lensDefaultValues.left + 'px'
+        this.controls.lens.style.top = this.lensDefaultValues.top + 'px'
+    }
+
+    addListeners(): void {
+        // Объект котороый хранит внутри себя тип и само действие для элементов объекта controls
+        const controlsEvents = {
+            // Действие клика
+            click: {
+                // Элемент (this.controls.choose) которому присваеиваем это действие. Далее по аналогии
+                choose: () => {
+                    this.setStateWidget(States.Menu)
+                },
+                back: () => {
+                    this.setStateWidget(States.Menu, true)
+                    this.changeLensInfo(this.lens[this.activeLens])
+                },
+                tryonBtn: () => {
+                    if (this.tryonButtonState === TryonButtonState.Upload || this.tryonButtonState === TryonButtonState.Retake) {
+                        this.loadVideo()
+                        this.setLensInDefaultPositions()
+                        this.controls.lens.style.zIndex = ''
+                    } else if (this.tryonButtonState === TryonButtonState.Snap) {
+                        this.setStateWidget(States.Menu)
+                        this.videoSettings.canvas.style.zIndex = 2
+                        this.controls.lens.style.zIndex = 4
+                        this.controls.tryonBtnText.textContent = this.tryonButtonState = TryonButtonState.Retake
+
+                        const context = this.videoSettings.canvas.getContext('2d')
+                        if (this.videoSettings.width && this.videoSettings.height) {
+                            this.videoSettings.canvas.width = this.videoSettings.width
+                            this.videoSettings.canvas.height = this.videoSettings.height
+                            context.drawImage(this.videoSettings.video, 0, 0, this.videoSettings.width, this.videoSettings.height)
+
+                            this.videoSettings.stream.getTracks().forEach(track => {
+                                track.stop();
+                            });
+                        }
                     }
+                },
+                size: () => {
+
+                },
+                rotate: () => {
+
+                },
+                reset: () => {
+                    this.rangeListener(true)
+                    this.controls.pd.value = 62
                 }
             },
-            pd: () => {
+            mousedown: {
+                lens: () => {
+                    if (!this.wEl.classList.contains(States.Menu)) {
+                        return
+                    }
 
-            },
-            size: () => {
+                    // Поиск краев за которые лизны не должны выходить
+                    const findEdge = (): {rightEdge: number, bottomEdge: number} => {
+                        const container: Element = this.wContainer.querySelector('.tryon')
+                        const lens = this.controls.lens
+                        const contW: number = container.clientWidth
+                        const contH: number = container.clientHeight
+                        const lensW: number = lens.clientWidth
+                        const lensH: number = lens.clientHeight
 
-            },
-            rotate: () => {
+                        return {
+                            rightEdge: contW - lensW,
+                            bottomEdge: contH - lensH
+                        }
+                    }
 
+                    const {rightEdge, bottomEdge} = findEdge()
+
+                    const mouseUp = () => {
+                        document.onmousemove = document.onmouseup = null
+                    }
+
+                    document.onmousemove = ({movementX, movementY}) => {
+                        const getStyle = window.getComputedStyle(this.controls.lens)
+                        const leftV = parseInt(getStyle.left)
+                        const topV = parseInt(getStyle.top)
+
+                        const totalLeft = leftV + movementX
+                        const totalTop = topV + movementY
+                        if (totalLeft < 0
+                            || totalTop < 0
+                            || totalTop > bottomEdge
+                            || totalLeft > rightEdge && movementX > 0 // Проверяю movementX в случае если рядом с карем был увеличен pd и объект с крестом ушел за край видимости
+                        ) {
+                            mouseUp()
+                            return
+                        } else {
+                            this.controls.lens.style.left = totalLeft + 'px'
+                            this.controls.lens.style.top = totalTop + 'px'
+                        }
+                    }
+
+                    document.onmouseup = mouseUp
+                }
             },
-            reset: () => {
-                this.rangeListener(true)
-                // this.controls.pd.value = 64
+            input: {
+                pd: e => {
+                    if (e.target.value < 50) {
+                        e.target.value = 50
+                    } else if (e.target.value > 150) {
+                        e.target.value = 150
+                    }
+                    const value = e.target.value - 62
+                    this.controls.lens.style.width = this.lensDefaultValues.width + value + 'px'
+                },
             }
         }
 
-        Object.keys(this.controls).map(key => {
-            this.controls[key].addEventListener('click', buttonsEvents[key])
+        // Далее для элементов управления указанных в обхекте controls, присваиваются действия определяемые в объекте controlsEvents
+        Object.keys(controlsEvents).map(action => {
+            Object.keys(controlsEvents[action]).map(key => {
+                this.controls[key].addEventListener(action, controlsEvents[action][key])
+            })
         })
     }
 }

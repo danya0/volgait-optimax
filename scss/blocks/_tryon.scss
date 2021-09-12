@@ -2,11 +2,17 @@
   position: relative;
 
   &-first-block {
+    position: relative;
     z-index: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
   }
 
   &-allow-block {
-    position: relative;
+    position: absolute;
+    left: 0;
+    top: 0;
     background: #ffffff;
     width: 100%;
     height: 100%;
@@ -75,10 +81,10 @@
 
   &__lens {
     position: absolute;
-    width: 200px;
-    left: 126px;
-    top: 167px;
-    height: 55px;
+    width: 130px;
+    left: 160px;
+    top: 160px;
+    height: 75px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -115,6 +121,47 @@
 
     &__canvas {
       display: none;
+    }
+  }
+
+  .cross {
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    cursor: move;
+
+    &__item {
+      height: 33px;
+      width: 33px;
+      position: relative;
+      &:before, &:after {
+        position: absolute;
+        background-color: red;
+      }
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        transform: translateY(-50%);
+        height: 3.33px;
+      }
+      &:after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        height: 100%;
+        transform: translateX(-50%);
+        width: 3.33px;
+      }
+      &:first-child {
+        margin-right: 10px;
+      }
+      &:last-child {
+        margin-left: 10px;
+      }
     }
   }
 
