@@ -30,7 +30,7 @@ const path = {
   watch: {
     html: '*.html',
     css: 'scss/**/*.scss',
-    js: 'ts/**/*.ts',
+    js: 'ts/**/*.{js,ts}',
     assets: 'assets/**/*.*'
   },
   clean: `./${projectFolder}/`,

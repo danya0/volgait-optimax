@@ -41,6 +41,7 @@
     "webpack-stream": "^6.1.2"
   },
   "dependencies": {
+    "jquery": "^3.6.0",
     "swiper": "^6.8.2"
   }
 }
