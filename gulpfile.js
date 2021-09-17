@@ -2,11 +2,6 @@ const gulp = require('gulp')
 const del = require('del')
 const browserSync = require('browser-sync').create()
 const webpack = require('webpack-stream')
-const rename = require('gulp-rename')
-const gulpIf = require('gulp-if')
-const autoprefixer = require("gulp-autoprefixer")
-const scss = require('gulp-sass')(require('sass'))
-const cleanCSS = require('gulp-clean-css')
 
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = !isDev
@@ -30,7 +25,7 @@ const path = {
   watch: {
     html: '*.html',
     css: 'scss/**/*.scss',
-    js: 'ts/**/*.ts',
+    js: 'ts/**/*.{js,ts}',
     assets: 'assets/**/*.*'
   },
   clean: `./${projectFolder}/`,

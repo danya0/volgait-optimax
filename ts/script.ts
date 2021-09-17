@@ -1,7 +1,9 @@
 import '../scss/widget.scss'
-import {$cssUrl} from "./utils"
-import Swiper from 'swiper/bundle';
-import 'swiper/swiper-bundle.css';
+import {$cssUrl} from './utils'
+import Swiper from 'swiper/bundle'
+import 'swiper/swiper-bundle.css'
+import $ from 'jquery'
+import './plugins/guillotine/jquery.guillotine.min'
 
 enum States {
     AllowCamera = 'allow',
@@ -51,6 +53,7 @@ class VirtualMirrorWidget {
     videoSettings = {
         width: 320,
         height: 0,
+        pdDefault: 62,
         streaming: false,
         canvas: null,
         video: null,
@@ -58,6 +61,10 @@ class VirtualMirrorWidget {
         allow: false
     }
     lensDefaultValues: {[key: string]: number} = {}
+
+    guillotineObject = null
+    sizeInputValue: number = 0
+    rotateInputValue: number = 0
 
     constructor() {
         this.init()
@@ -104,8 +111,8 @@ class VirtualMirrorWidget {
         new Swiper('.goods-block', {
             slidesPerView: 3,
             navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
             },
         })
     }
@@ -253,6 +260,48 @@ class VirtualMirrorWidget {
         this.controls.lens.style.top = this.lensDefaultValues.top + 'px'
     }
 
+    // Метод который создает экземпляр guillotine
+    createGuillotine() {
+        const cameraWrap = $('.tryon-camera')
+        const width = cameraWrap.width()
+        const height = cameraWrap.height()
+        this.guillotineObject = $('#virtual-mirror-widget #camera')
+        this.guillotineObject.guillotine({width, height})
+    }
+
+    // метод для изменения состояния guillotine
+    stopGuillotine(stopGuillotine: boolean) {
+        if (!this.guillotineObject) {
+            return
+        }
+
+        const guillotineWindow: Element = this.wEl.querySelector('.guillotine-window')
+        const className: string = 'default-cursor'
+
+        if (stopGuillotine) {
+            guillotineWindow.classList.add(className)
+            this.guillotineObject.css('pointerEvents', 'none')
+        } else {
+            guillotineWindow.classList.remove(className)
+            this.guillotineObject.css('pointerEvents', '')
+        }
+    }
+
+    // Сброс параметров каких-либо пользовательских настроек
+    resetAdjastments() {
+        if (!this.guillotineObject || !this.videoSettings.canvas) {
+            return
+        }
+
+        for (let i = 0; i < 10; i++) {
+            this.guillotineObject.guillotine('zoomOut')
+        }
+        this.rangeListener(true)
+        this.videoSettings.canvas.style.transform = ''
+        this.controls.pd.value = this.videoSettings.pdDefault
+        this.controls.lens.style.width = this.lensDefaultValues.width + 'px'
+    }
+
     addListeners(): void {
         // Объект котороый хранит внутри себя тип и само действие для элементов объекта controls
         const controlsEvents = {
@@ -265,14 +314,18 @@ class VirtualMirrorWidget {
                 back: () => {
                     this.setStateWidget(States.Menu, true)
                     this.changeLensInfo(this.lens[this.activeLens])
+                    this.stopGuillotine(true)
                 },
                 tryonBtn: () => {
                     if (this.tryonButtonState === TryonButtonState.Upload || this.tryonButtonState === TryonButtonState.Retake) {
+                        this.resetAdjastments()
                         this.loadVideo()
                         this.setLensInDefaultPositions()
                         this.controls.lens.style.zIndex = ''
                     } else if (this.tryonButtonState === TryonButtonState.Snap) {
+                        this.stopGuillotine(false)
                         this.setStateWidget(States.Menu)
+                        this.createGuillotine()
                         this.videoSettings.canvas.style.zIndex = 2
                         this.controls.lens.style.zIndex = 4
                         this.controls.tryonBtnText.textContent = this.tryonButtonState = TryonButtonState.Retake
@@ -289,15 +342,8 @@ class VirtualMirrorWidget {
                         }
                     }
                 },
-                size: () => {
-
-                },
-                rotate: () => {
-
-                },
                 reset: () => {
-                    this.rangeListener(true)
-                    this.controls.pd.value = 62
+                    this.resetAdjastments()
                 }
             },
             mousedown: {
@@ -357,9 +403,26 @@ class VirtualMirrorWidget {
                     } else if (e.target.value > 150) {
                         e.target.value = 150
                     }
-                    const value = e.target.value - 62
+                    const value: number = e.target.value - 62
                     this.controls.lens.style.width = this.lensDefaultValues.width + value + 'px'
                 },
+                size: e => {
+                    const value: number = +e.target.value
+                    const way: string = this.sizeInputValue < value ? 'zoomIn' : this.sizeInputValue > value ? 'zoomOut' : null
+                    const gap: number = Math.abs(value - this.sizeInputValue)
+                    this.sizeInputValue = value
+
+                    for (let i = 0; i < gap; i++) {
+                        this.guillotineObject.guillotine(way)
+                    }
+                },
+                rotate : e => {
+                    const value: number = +e.target.value
+                    this.rotateInputValue = value
+                    console.log(value)
+
+                    this.videoSettings.canvas.style.transform = `rotate(${value}deg)`
+                }
             }
         }
 
