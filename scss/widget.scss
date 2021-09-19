@@ -1,5 +1,6 @@
 @import 'fonts';
 @import 'variables';
+@import 'media';
 
 [data-virtual-mirror-widget] {
   @import 'grid';
@@ -41,6 +42,10 @@
     line-height: 24px;
     font-weight: bold;
     color: $titleColor;
+
+    @include tablet-w {
+      text-align: center;
+    }
 
     &.white {
       color: #ffffff;
