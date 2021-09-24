@@ -3,6 +3,11 @@
   padding: 17px 0 0 26px;
   max-width: 280px;
 
+  @include tablet-w {
+    max-width: none;
+    padding: 17px 26px;
+  }
+
   &-back {
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -16,11 +21,7 @@
   }
 
   &__title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
     font-size: 20px;
-    line-height: 24px;
-    color: $titleColor;
     margin-bottom: 32px;
   }
 
@@ -62,9 +63,21 @@
       margin-left: 18px;
       outline: none;
       color: #89959C;
+
+      @include tablet-w {
+        margin: 0 0 0 20px;
+      }
+
+      @media (max-width: 430px) {
+        margin-top: 10px;
+      }
     }
 
     &.help {
+
+      @include tablet-w {
+        align-items: center;
+      }
 
       .help-ico {
         margin-left: 4px;

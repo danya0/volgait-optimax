@@ -6,6 +6,10 @@
     padding-left: 22px;
     position: relative;
     z-index: 2;
+
+    @include tablet-w {
+      padding-left: 0;
+    }
   }
 
   &-block {

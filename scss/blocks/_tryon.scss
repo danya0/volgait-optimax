@@ -77,6 +77,11 @@
     background-size: cover;
     background-repeat: no-repeat;
     border-radius: 10px;
+
+    @include mobileS-w {
+      background-size: contain;
+      background-position: center;
+    }
   }
 
   &__lens {
@@ -88,6 +93,12 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
+
+    @include mobileS-w {
+      left: 50%;
+      top: 50%;
+      transform: translate(-47%, -55%) !important;
+    }
   }
 
   &-camera {

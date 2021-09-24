@@ -9,6 +9,19 @@
   border-radius: 12px;
   overflow: hidden;
 
+  @include tablet-w {
+    grid-template: 413px auto auto / 100%;
+    grid-template-areas: "tryon" "info" "goods";
+    height: auto;
+    width: 444px;
+    max-width: 751px;
+  }
+
+  @include mobileS-w {
+    grid-template: "tryon" 310px "info" auto "goods" auto/ 100%;
+    width: 95%;
+  }
+
   &.menu-opened {
     & .info, & .goods {
       display: none;
@@ -25,6 +38,10 @@
     }
 
     grid-template-areas: "tryon cust" "buttons cust";
+
+    @include tablet-w {
+      grid-template-areas: "tryon" "cust" "buttons";
+    }
   }
 
   &.allow {
