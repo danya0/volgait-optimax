@@ -1,0 +1,58 @@
+.slider-plugin {
+  position: relative;
+  .slider-wrapper {
+    transition: .3s ease;
+    display: flex;
+  }
+
+  .slider-slide {
+    display: flex;
+    justify-content: center;
+  }
+
+  $space: 20px;
+  $borderSize: 4px;
+  $activeColor: #0F0F0FFF;
+  $noActiveColor: rgba(15, 15, 15, 0.5);
+  @mixin sliderButton {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-top: $borderSize solid $activeColor;
+    border-right: $borderSize solid $activeColor;
+  }
+
+
+  .slider-button-next, .slider-button-prev {
+    position: absolute;
+    top: 45%;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+
+    ._no-active {
+      border-top: $borderSize solid $noActiveColor;
+      border-right: $borderSize solid $noActiveColor;
+    }
+  }
+
+  .slider-button-next:before, .slider-button-prev:before {
+    @include sliderButton
+  }
+
+  .slider-button {
+    &-prev {
+      left: $space;
+      &:before {
+        transform: rotate(-135deg);
+      }
+    }
+    &-next {
+      right: $space;
+      &:before {
+        transform: rotate(45deg);
+      }
+    }
+  }
+}
