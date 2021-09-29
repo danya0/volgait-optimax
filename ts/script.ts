@@ -1,9 +1,8 @@
 import '../scss/widget.scss'
 import {$cssUrl} from './utils'
-import Swiper from 'swiper/bundle'
-import 'swiper/swiper-bundle.css'
 import $ from 'jquery'
 import './plugins/guillotine/jquery.guillotine.min'
+import Slider from "./slider";
 
 enum States {
     AllowCamera = 'allow',
@@ -109,22 +108,22 @@ class VirtualMirrorWidget {
     }
 
     createSlider(): void {
-        new Swiper('.goods-block', {
-            slidesPerView: 3,
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
+        new Slider('.goods-block', {
+            breakpoints: {
+                750: {
+                    slidesPerView: 1
+                }
+            }
         })
     }
 
     loadLens(): void {
-        const wrap = document.querySelector('.goods-block .swiper-wrapper')
+        const wrap = document.querySelector('.goods-block .slider-wrapper')
         fetch(this.wOptions.lensUrl)
             .then(res => res.json())
             .then(data => {
                 const lensTemplate = (name: string, image: string, id: number) => (`
-                    <div class="swiper-slide">
+                    <div class="slider-slide">
                       <div class="goods__item" data-lens-id="${id}">
                         <img src="${image}" alt="lens" class="goods__lens"/>
                         <div class="goods__name">${name}</div>
