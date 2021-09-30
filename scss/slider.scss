@@ -13,7 +13,7 @@
   $space: 20px;
   $borderSize: 4px;
   $activeColor: #0F0F0FFF;
-  $noActiveColor: rgba(15, 15, 15, 0.5);
+  $noActiveColor: rgba(15, 15, 15, 0.25);
   @mixin sliderButton {
     content: '';
     position: absolute;
@@ -21,6 +21,7 @@
     height: 30px;
     border-top: $borderSize solid $activeColor;
     border-right: $borderSize solid $activeColor;
+    transition: border-top-color .2s ease-in, border-right-color .2s ease-in;
   }
 
 
@@ -31,7 +32,7 @@
     width: 40px;
     cursor: pointer;
 
-    ._no-active {
+    &.no-active:before {
       border-top: $borderSize solid $noActiveColor;
       border-right: $borderSize solid $noActiveColor;
     }
