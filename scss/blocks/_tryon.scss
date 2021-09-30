@@ -95,9 +95,9 @@
     background-size: contain;
 
     @include mobileS-w {
-      left: 50%;
-      top: 50%;
-      transform: translate(-47%, -55%) !important;
+      top: 35%;
+      left: calc(50% - 60px);
+      transform: scale(1) !important;
     }
   }
 

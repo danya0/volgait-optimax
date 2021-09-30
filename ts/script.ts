@@ -152,7 +152,7 @@ class VirtualMirrorWidget {
         const $frameScaleRatio = (frameWidth / 200) / (pd / 100)
         // Не до конца понял формулу скейла. Поэтому не стал применять её, т.к возникают баги в размерах
         // this.controls.lens.style.transform = `scale(${$frameScaleRatio})`
-        this.controls.lens.style.transform = `scale(${1.1})`
+        this.controls.lens.style.transform = `scale(${1.2})`
 
         // console.log('scale formula: ', `(frameWidth(${frameWidth}) / 200) / (pd(${pd}) / 100)`)
         // console.log(`${frameWidth / 200} / ${pd / 100}`)
@@ -313,6 +313,21 @@ class VirtualMirrorWidget {
             stopGuillotine(true)
         }
 
+        // Переменна которая определяет, какое устройство использует пользователь
+        let smartphone: boolean = false
+        // Проверка девайса
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+            console.log('Smartphone device')
+            smartphone = true
+        }
+        // Объект который хранит в себе названия действий в зависимости от переменной smartphone
+        const eventsDragNames = {
+            start: smartphone ? 'touchstart' : 'mousedown',
+            move: smartphone ? 'touchmove' : 'mousemove',
+            end: smartphone ? 'touchend' : 'mouseup'
+        }
+        let previousTouch
+
         // Объект котороый хранит внутри себя тип и само действие для элементов объекта controls
         const controlsEvents = {
             // Действие клика
@@ -352,11 +367,14 @@ class VirtualMirrorWidget {
                 },
                 reset: resetAdjastments,
             },
-            mousedown: {
+            // В зависимости от перменной smartphone определяет действие (mousedown или touchstart)
+            [eventsDragNames.start]: {
                 lens: () => {
                     if (!this.wEl.classList.contains(States.Menu)) {
                         return
                     }
+
+                    smartphone ? document.body.style.overflow = 'hidden' : null
 
                     // Поиск краев за которые лизны не должны выходить
                     const findEdge = (): { rightEdge: number, bottomEdge: number } => {
@@ -376,13 +394,26 @@ class VirtualMirrorWidget {
                     const {rightEdge, bottomEdge} = findEdge()
 
                     const mouseUp = () => {
-                        document.onmousemove = document.onmouseup = null
+                        document[`on${eventsDragNames.end}`] = null
+                        document.removeEventListener(eventsDragNames.move, move)
+                        previousTouch = null
+
+                        smartphone ? document.body.style.overflow = '' : null
                     }
 
-                    document.onmousemove = ({movementX, movementY}) => {
+                    const move = e => {
+                        e.preventDefault()
+
                         const getStyle = window.getComputedStyle(this.controls.lens)
                         const leftV: number = parseInt(getStyle.left)
                         const topV: number = parseInt(getStyle.top)
+
+                        // Поддержка так устройств
+                        const touch = smartphone ? e.targetTouches[0] : null
+                        const movementX = !smartphone ? e.movementX : previousTouch ? Math.round(touch.pageX - previousTouch.pageX): 0
+                        const movementY = !smartphone ? e.movementY : previousTouch ? Math.round(touch.pageY - previousTouch.pageY) : 0
+
+                        previousTouch = touch
 
                         const totalLeft: number = leftV + movementX
                         const totalTop: number = topV + movementY
@@ -391,7 +422,6 @@ class VirtualMirrorWidget {
                             || totalTop > bottomEdge
                             || totalLeft > rightEdge && movementX > 0 // Проверяю movementX в случае если рядом с карем был увеличен pd и объект с крестом ушел за край видимости
                         ) {
-                            mouseUp()
                             return
                         } else {
                             this.controls.lens.style.left = totalLeft + 'px'
@@ -399,7 +429,9 @@ class VirtualMirrorWidget {
                         }
                     }
 
-                    document.onmouseup = mouseUp
+                    document.addEventListener(eventsDragNames.move, move, {passive: false})
+
+                    document[`on${eventsDragNames.end}`] = mouseUp
                 }
             },
             input: {
