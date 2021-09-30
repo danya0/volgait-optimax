@@ -63,6 +63,7 @@ export default class Slider implements ISlider{
         this.findArrowButtons()
         this.arrowButtonsListeners()
 
+        this.checkArrowButtonState()
         this.checkBreakpoints()
 
         window.addEventListener('resize', () => {
@@ -89,6 +90,23 @@ export default class Slider implements ISlider{
         this.$arrowButtons.next = this.$wrap.querySelector('.slider-button-next')
     }
 
+    checkArrowButtonState() {
+        if (this.currentSlide !== 0 && this.slidesToScroll !== this.currentSlide) {
+            Object.keys(this.$arrowButtons).forEach(keyBtn => {
+                const obj = this.$arrowButtons[keyBtn]
+                if (obj.classList.contains('no-active')) {
+                    obj.classList.remove('no-active')
+                }
+            })
+        }
+        if (this.slidesToScroll === this.currentSlide) {
+            this.$arrowButtons.next.classList.add('no-active')
+        }
+        if (this.currentSlide === 0) {
+            this.$arrowButtons.prev.classList.add('no-active')
+        }
+    }
+
     arrowClick(next: boolean) {
         const prev = this.currentSlide
         if (next && this.slidesToScroll > this.currentSlide) {
@@ -98,6 +116,7 @@ export default class Slider implements ISlider{
         }
 
         if (prev !== this.currentSlide) {
+            this.checkArrowButtonState()
             this.moveSlide()
         }
     }
