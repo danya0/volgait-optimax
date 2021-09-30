@@ -317,7 +317,6 @@ class VirtualMirrorWidget {
         let smartphone: boolean = false
         // Проверка девайса
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-            console.log('Smartphone device')
             smartphone = true
         }
         // Объект который хранит в себе названия действий в зависимости от переменной smartphone

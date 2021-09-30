@@ -37,25 +37,6 @@ function html() {
       .pipe(browserSync.stream())
 }
 
-// function css() {
-//   return gulp.src(path.source.css)
-//       .pipe(scss({
-//         outputStyle: 'expanded'
-//       }))
-//       .pipe(autoprefixer({
-//         overrideBrowserslist: isDev ? [">1%", "not dead"] : ["last 5 version"],
-//         cascade: false
-//       }))
-//       .pipe(gulp.dest(path.build.css))
-//       // if build
-//       .pipe(gulpIf(isProd, cleanCSS({compatibility: 'ie8'})))
-//       .pipe(gulpIf(isProd, rename({
-//         extname: ".min.css",
-//       })))
-//       .pipe(gulpIf(isProd, gulp.dest(path.build.css)))
-//       .pipe(browserSync.stream())
-// }
-
 function js() {
   return gulp.src(path.source.js)
       .pipe(
