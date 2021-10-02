@@ -1,5 +1,5 @@
 import '../scss/widget.scss'
-import {$cssUrl} from './utils'
+import {$toPxString, $cssUrl} from './utils'
 import $ from 'jquery'
 import './plugins/guillotine/jquery.guillotine.min'
 import Slider from "./slider";
@@ -256,7 +256,10 @@ class VirtualMirrorWidget {
             this.rangeListener(true)
             this.videoSettings.canvas.style.transform = ''
             this.controls.pd.value = this.videoSettings.pdDefault
-            this.controls.lens.style.width = this.lensDefaultValues.width + 'px'
+            this.controls.lens.style.width = $toPxString(this.lensDefaultValues.width)
+
+            this.controls.lens.style.left = $toPxString(this.lensDefaultValues.left)
+            this.controls.lens.style.top = $toPxString(this.lensDefaultValues.left)
         }
 
         // Функция работы с видеокамерой
@@ -302,8 +305,8 @@ class VirtualMirrorWidget {
 
         // Установка линз в дефолтное положение
         const setLensInDefaultPositions = (): void => {
-            this.controls.lens.style.left = this.lensDefaultValues.left + 'px'
-            this.controls.lens.style.top = this.lensDefaultValues.top + 'px'
+            this.controls.lens.style.left = $toPxString(this.lensDefaultValues.left)
+            this.controls.lens.style.top = $toPxString(this.lensDefaultValues.top)
         }
 
         // Функция примерки линз
@@ -423,8 +426,8 @@ class VirtualMirrorWidget {
                         ) {
                             return
                         } else {
-                            this.controls.lens.style.left = totalLeft + 'px'
-                            this.controls.lens.style.top = totalTop + 'px'
+                            this.controls.lens.style.left = $toPxString(totalLeft)
+                            this.controls.lens.style.top = $toPxString(totalTop)
                         }
                     }
 
@@ -435,13 +438,11 @@ class VirtualMirrorWidget {
             },
             input: {
                 pd: e => {
-                    if (e.target.value < 50) {
-                        e.target.value = 50
-                    } else if (e.target.value > 150) {
-                        e.target.value = 150
+                    if (e.target.value < 50 || e.target.value > 150) {
+                        return
                     }
                     const value: number = e.target.value - 62
-                    this.controls.lens.style.width = this.lensDefaultValues.width + value + 'px'
+                    this.controls.lens.style.width = $toPxString(this.lensDefaultValues.width + value)
                 },
                 size: e => {
                     const value: number = +e.target.value
@@ -458,6 +459,15 @@ class VirtualMirrorWidget {
                     this.rotateInputValue = value
 
                     this.videoSettings.canvas.style.transform = `rotate(${value}deg)`
+                }
+            },
+            focusout: {
+                pd: e => {
+                    if (e.target.value < 50) {
+                        e.target.value = 50
+                    } else if (e.target.value > 150) {
+                        e.target.value = 150
+                    }
                 }
             }
         }
