@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "homepage": "https://danya0.github.io/volgait-optimax/",
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
     "dev": "cross-env NODE_ENV=development gulp dev",
-    "start": "cross-env NODE_ENV=development gulp start"
+    "start": "cross-env NODE_ENV=development gulp start",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,6 @@
   "bugs": {
     "url": "https://github.com/danya0/volgait-optimax/issues"
   },
-  "homepage": "https://github.com/danya0/volgait-optimax#readme",
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
@@ -29,6 +31,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^5.2.7",
     "del": "^6.0.0",
+    "gh-pages": "^3.2.3",
     "gulp": "^4.0.2",
     "sass": "^1.37.5",
     "sass-loader": "^10.1.1",

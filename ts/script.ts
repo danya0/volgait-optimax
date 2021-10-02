@@ -18,7 +18,7 @@ enum TryonButtonState {
 }
 
 class VirtualMirrorWidget {
-    readonly cdnServer = '/' // В дальнейшем вы можете изменить путь к c серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
+    readonly cdnServer = 'https://danya0.github.io/volgait-optimax/' // В дальнейшем вы можете изменить путь к c серверу и разместить на нем: js, css, html файлы отснсящиеся к виджету.
     readonly assetsFolder = 'assets/'
     readonly wOptions = {
         initId: 'virtual-mirror-widget',
