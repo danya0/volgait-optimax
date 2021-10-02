@@ -316,6 +316,12 @@ class VirtualMirrorWidget {
             stopGuillotine(true)
         }
 
+        // Функция изменения pd
+        const changePd = targetValue => {
+            const value: number = targetValue - 62
+            this.controls.lens.style.width = $toPxString(this.lensDefaultValues.width + value)
+        }
+
         // Переменна которая определяет, какое устройство использует пользователь
         let smartphone: boolean = false
         // Проверка девайса
@@ -441,8 +447,7 @@ class VirtualMirrorWidget {
                     if (e.target.value < 50 || e.target.value > 150) {
                         return
                     }
-                    const value: number = e.target.value - 62
-                    this.controls.lens.style.width = $toPxString(this.lensDefaultValues.width + value)
+                    changePd(e.target.value)
                 },
                 size: e => {
                     const value: number = +e.target.value
@@ -463,10 +468,14 @@ class VirtualMirrorWidget {
             },
             focusout: {
                 pd: e => {
+                    const f = (v) => {
+                        e.target.value = v
+                        changePd(v)
+                    }
                     if (e.target.value < 50) {
-                        e.target.value = 50
+                        f(50)
                     } else if (e.target.value > 150) {
-                        e.target.value = 150
+                        f(150)
                     }
                 }
             }
